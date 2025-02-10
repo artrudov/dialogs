@@ -1,0 +1,10 @@
+spring:
+  application:
+    name: dialog
+  datasource:
+    url: jdbc:postgresql://localhost:5532/postgres
+    username: postgres
+    password: password
+    driver-class-name: org.postgresql.Driver
+  flyway:
+    locations: classpath:db/migration

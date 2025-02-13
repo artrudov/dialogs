@@ -1,16 +1,53 @@
 package com.otus.dialog.repositories
 
+import com.fasterxml.jackson.core.JsonProcessingException
+import com.fasterxml.jackson.databind.JsonDeserializer
+import com.fasterxml.jackson.databind.JsonSerializer
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.otus.dialog.domain.Message
-import jakarta.annotation.Resource
-import org.springframework.data.redis.core.ListOperations
+import com.otus.dialog.domain.MessageResponse
+import lombok.extern.slf4j.Slf4j
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.core.io.ClassPathResource
+import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Repository
+import redis.clients.jedis.JedisPool
 import java.security.MessageDigest
+import java.util.*
 
 
+@Slf4j
 @Repository
 class DialogRepository {
-  @Resource(name = "redisTemplate")
-  lateinit var listOps: ListOperations<String, Message>
+  @Autowired
+  lateinit var jedisPool: JedisPool
+
+  // Загрузка скрипта из файла
+  private val sendMessageScript: String by lazy {
+    ClassPathResource("scripts/sendMessagesScript.lua")
+      .inputStream.bufferedReader().use { it.readText() }
+  }
+
+  // Получение SHA-хэша скрипта
+  private val sendScriptSha: String by lazy {
+    jedisPool.resource.use { jedis ->
+      jedis.scriptLoad(sendMessageScript)
+    }
+  }
+
+  // Загрузка скрипта из файла
+  private val readMessageScript: String by lazy {
+    ClassPathResource("scripts/readMessagesScript.lua")
+      .inputStream.bufferedReader().use { it.readText() }
+  }
+
+  // Получение SHA-хэша скрипта
+  private val readScriptSha: String by lazy {
+    jedisPool.resource.use { jedis ->
+      jedis.scriptLoad(readMessageScript)
+    }
+  }
 
   @OptIn(ExperimentalStdlibApi::class)
   fun toHash(senderId: Long, recipientId: Long): String {
@@ -20,14 +57,41 @@ class DialogRepository {
     return digest.toHexString()
   }
 
-  fun save(message: Message) {
-    listOps.leftPush(
-      toHash(message.userFrom, message.userTo),
-      message
-    )
+  fun save(newMessage: Message) {
+    jedisPool.resource.use { resource ->
+      resource.evalsha(
+        sendScriptSha,
+        mutableListOf(toHash(newMessage.userFrom, newMessage.userTo)),
+        mutableListOf(
+          newMessage.author.toString(),
+          newMessage.text
+        )
+      )
+    }
   }
 
-  fun findAll(recipientId: Long, senderId: Long): List<Message> {
-    return listOps.range(toHash(senderId, recipientId), 0, Long.MAX_VALUE)?.toList() ?: listOf()
+  fun findAll(recipientId: Long, senderId: Long, pageable: Pageable): List<MessageResponse> {
+    val result: Any
+    val startIndex = (pageable.pageNumber - 1) * pageable.pageSize
+    val endIndex = startIndex + pageable.pageSize
+
+    jedisPool.resource.use { resource ->
+      result = resource.evalsha(
+        readScriptSha,
+        mutableListOf(toHash(senderId, recipientId)),
+        mutableListOf(
+          startIndex.toString(),
+          endIndex.toString()
+        ),
+      )
+    }
+
+    val messages: List<MessageResponse> = (result as List<String>).stream()
+      .map { row: String ->
+        ObjectMapper().readValue(row, MessageResponse::class.java)
+      }
+      .toList()
+
+    return messages
   }
 }

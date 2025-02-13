@@ -1,0 +1,1 @@
+return redis.call("LRANGE", KEYS[1], ARGV[1], ARGV[2])

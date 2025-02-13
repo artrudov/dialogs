@@ -1,10 +1,13 @@
 package com.otus.dialog.controllers
 
 import com.otus.dialog.domain.Message
+import com.otus.dialog.domain.MessageResponse
 
 import com.otus.dialog.domain.NewMessage
 import com.otus.dialog.services.DialogService
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.data.domain.Pageable
+import org.springframework.data.web.PageableDefault
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
@@ -31,12 +34,13 @@ class DialogController {
   @GetMapping("{recipientId}")
   fun findAllMessages(
     @RequestHeader("X-User-Id") senderId: Long,
-    @PathVariable recipientId: Long
-  ): ResponseEntity<List<Message>> {
+    @PathVariable recipientId: Long,
+    @PageableDefault(size = 10, page = 1) pageable: Pageable
+  ): ResponseEntity<List<MessageResponse>> {
     return ResponseEntity
       .ok()
       .body(
-        dialogService.findAll(recipientId, senderId)
+        dialogService.findAll(recipientId, senderId, pageable)
       )
   }
 }

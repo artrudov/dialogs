@@ -14,21 +14,29 @@ class DialogService {
   lateinit var dialogRepository: DialogRepository
 
   fun save(dialog: NewMessage, recipientId: Long, senderId: Long) {
-    if (recipientId != senderId)
-      dialogRepository.save(
-        Message(
-          id = null,
-          userFrom = senderId,
-          userTo = recipientId,
-          text = dialog.text,
-        )
+    if (recipientId == senderId) throw ResponseStatusException(
+      HttpStatus.BAD_REQUEST,
+      "You can't get messages to yourself"
+    )
+
+    dialogRepository.save(
+      Message(
+        userFrom = if (senderId > recipientId) senderId else recipientId,
+        userTo = if (recipientId > senderId) recipientId else senderId,
+        text = dialog.text,
       )
-      else throw ResponseStatusException(HttpStatus.BAD_REQUEST, "You can't send message to yourself")
+    )
   }
 
   fun findAll(recipientId: Long, senderId: Long): List<Message> {
-    if (recipientId == senderId) throw ResponseStatusException(HttpStatus.BAD_REQUEST, "You can't get messages to yourself")
+    if (recipientId == senderId) throw ResponseStatusException(
+      HttpStatus.BAD_REQUEST,
+      "You can't get messages to yourself"
+    )
 
-    return dialogRepository.findAll(recipientId, senderId)
+    return dialogRepository.findAll(
+      if (recipientId > senderId) recipientId else senderId,
+      if (senderId > recipientId) senderId else recipientId
+    )
   }
 }

@@ -3,10 +3,14 @@ version: '3.9'
 services:
 
   redis:
-    container_name: redis
     image: "redis:latest"
     ports:
       - "6379:6379"
+
+  zipkin:
+    image: "openzipkin/zipkin"
+    ports:
+      - "9411:9411"
 
 volumes:
   healthcheck-volume:

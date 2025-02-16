@@ -1,10 +1,6 @@
 package com.otus.dialog.repositories
 
-import com.fasterxml.jackson.core.JsonProcessingException
-import com.fasterxml.jackson.databind.JsonDeserializer
-import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.otus.dialog.domain.Message
 import com.otus.dialog.domain.MessageResponse
 import lombok.extern.slf4j.Slf4j
@@ -14,7 +10,6 @@ import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Repository
 import redis.clients.jedis.JedisPool
 import java.security.MessageDigest
-import java.util.*
 
 
 @Slf4j

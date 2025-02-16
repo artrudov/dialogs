@@ -3,3 +3,11 @@ spring:
     name: dialog
   flyway:
     locations: classpath:db/migration
+
+management:
+  tracing:
+    sampling:
+      probability: 1
+    enabled: true
+  zipkin:
+    endpoint: http://localhost:9411/api/v2/spans

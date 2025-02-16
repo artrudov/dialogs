@@ -1,0 +1,187 @@
+{
+	"info": {
+		"_postman_id": "8980682b-f253-42ba-9e42-2fe42768583b",
+		"name": "Dialogs",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "5480751"
+	},
+	"item": [
+		{
+			"name": "Random users",
+			"item": [
+				{
+					"name": "Create dialog",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "X-User-Id",
+								"value": "{{$randomInt}}",
+								"description": "Айди инициатора",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"text\": \"Для всех сообщений будет один текст\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}{{apiVersion}}/dialogs/{{$randomInt}}",
+							"host": [
+								"{{baseUrl}}{{apiVersion}}"
+							],
+							"path": [
+								"dialogs",
+								"{{$randomInt}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get messages",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-User-Id",
+								"value": "{{$randomInt}}",
+								"description": "Айди инициатора",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}{{apiVersion}}/dialogs/{{$randomInt}}",
+							"host": [
+								"{{baseUrl}}{{apiVersion}}"
+							],
+							"path": [
+								"dialogs",
+								"{{$randomInt}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "With id users",
+			"item": [
+				{
+					"name": "Get messages in target usres Copy",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "X-User-Id",
+								"value": "65656565",
+								"description": "Айди инициатора",
+								"type": "text"
+							},
+							{
+								"key": "X-Request-Id",
+								"value": "{{$randomInt}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"text\": \"Some text in target users\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}{{apiVersion}}/dialogs/300000",
+							"host": [
+								"{{baseUrl}}{{apiVersion}}"
+							],
+							"path": [
+								"dialogs",
+								"300000"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get messages in target usres",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-User-Id",
+								"value": "300000",
+								"description": "Айди инициатора",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}{{apiVersion}}/dialogs/65656565?size=10&page=1",
+							"host": [
+								"{{baseUrl}}{{apiVersion}}"
+							],
+							"path": [
+								"dialogs",
+								"65656565"
+							],
+							"query": [
+								{
+									"key": "size",
+									"value": "10"
+								},
+								{
+									"key": "page",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "localhost:8080",
+			"type": "string"
+		},
+		{
+			"key": "apiVersion",
+			"value": "/api/v1",
+			"type": "string"
+		}
+	]
+}

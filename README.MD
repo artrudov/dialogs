@@ -2,9 +2,10 @@
 * Set JAVA_HOME path variable
 * Install [Gradle](https://gradle.org/)
 * Run docker
-* Use VSCode ot Idea
+* Use VSCode or Idea
 * If you use Idea you have kotlin and runners
 * If you use VSCode you should install plugins [Gradle for Java](https://marketplace.visualstudio.com/items?itemName=vscjava.vscode-gradle)
 * Run next gradle task `./gradlew bootRun`
 * Open [PostmanCollection](./Highload-Lesson-1.postman_collection.json)
+* Check [OpenApi scheme](./openapi.json)
 * You can try it!
